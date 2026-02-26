@@ -1,0 +1,32 @@
+[
+  {
+    "nama": "Jefli Jonathan",
+    "umur": 21,
+    "alamat": {
+      "jalan": "Jl. Merdeka No. 123",
+      "kota": "Jakarta",
+      "provinsi": "DKI Jakarta"
+    },
+    "hobi": ["membaca", "bersepeda"]
+  },
+  {
+    "nama": "Felix Chandra",
+    "umur": 21,
+    "alamat": {
+      "jalan": "Jl. Merdeka No. 123",
+      "kota": "Jakarta",
+      "provinsi": "DKI Jakarta"
+    },
+    "hobi": ["membaca", "bersepeda"]
+  },
+  {
+    "nama": "Benny Chandra",
+    "umur": 21,
+    "alamat": {
+      "jalan": "Jl. Merdeka No. 123",
+      "kota": "Jakarta",
+      "provinsi": "DKI Jakarta"
+    },
+    "hobi": ["membaca", "bersepeda"]
+  }
+]

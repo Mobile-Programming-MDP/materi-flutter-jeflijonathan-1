@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pilem/models/movie.dart';
+import 'package:pilem/screens/detail_screen.dart';
 import 'package:pilem/services/api_service.dart';
+import 'package:pilem/widget/is_empty_image.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -73,23 +75,29 @@ class _HomeScreenState extends State<HomeScreen> {
             itemCount: movies.length,
             itemBuilder: (context, index) {
               final movie = movies[index];
-              return Container(
-                width: 120,
-                margin: EdgeInsets.symmetric(horizontal: 8),
-                child: Column(
-                  children: [
-                    Image.network(
-                      APIService.getImageUrl(movie.posterPath),
-                      height: 150,
-                      fit: BoxFit.cover,
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailScreen(movie: movie),
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      movie.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                  );
+                },
+                child: Container(
+                  width: 120,
+                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    children: [
+                      IsEmptyImage(urlImage: movie.posterPath),
+                      SizedBox(height: 8),
+                      Text(
+                        movie.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

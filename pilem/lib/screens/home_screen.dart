@@ -80,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Image.network(
                       APIService.getImageUrl(movie.posterPath),
+                      height: 150,
                       fit: BoxFit.cover,
                     ),
                     SizedBox(height: 8),

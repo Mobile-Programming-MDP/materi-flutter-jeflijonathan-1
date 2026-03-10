@@ -11,12 +11,13 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _Screens = [HomeScreen()];
+  final List<Widget> _Screens = [HomeScreen(), HomeScreen(), HomeScreen()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _Screens[_currentIndex],
+      appBar: AppBar(title: Text("Pilem")),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -24,8 +25,13 @@ class _MainScreenState extends State<MainScreen> {
             _currentIndex = index;
           });
         },
-        items: const [
+        items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: "Favorite",
+          ),
         ],
       ),
     );

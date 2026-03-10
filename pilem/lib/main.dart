@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pilem/screens/main_secreen.dart';
+import 'package:pilem/screens/main_screen.dart';
 
 void main() {
   runApp(const MyApp());

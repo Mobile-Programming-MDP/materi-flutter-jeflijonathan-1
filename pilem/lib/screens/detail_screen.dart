@@ -64,7 +64,6 @@ class _DetailScreenState extends State<DetailScreen> {
                 heigth: 400,
               ),
               const SizedBox(height: 8),
-
               Row(
                 children: [
                   IconButton(

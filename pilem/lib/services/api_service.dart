@@ -10,7 +10,6 @@ class APIService {
 
   // 1. mengambil list movie
   Future<List<Map<String, dynamic>>> getALLMovies() async {
-    const apiKey = '665ad89fcbde8e53916279e50a90f65f';
     final url = Uri.parse('$baseUrl/movie/now_playing?api_key=$apiKey');
 
     final response = await http.get(url);

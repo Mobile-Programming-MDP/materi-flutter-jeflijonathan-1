@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:pilem/models/movie.dart';
+import 'package:pilem/screens/detail_screen.dart';
 import 'package:pilem/services/api_service.dart';
 import 'package:pilem/widget/is_empty_image.dart';
 
@@ -64,17 +65,25 @@ class _SearchScreenState extends State<SearchScreen> {
       itemCount: movies.length,
       itemBuilder: (context, index) {
         final movie = movies[index];
-        return Card(
-          elevation: 5,
-          shadowColor: Colors.black.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: ListTile(
-            leading: IsEmptyImage(urlImage: movie.posterPath),
-            title: Text(movie.title),
-            subtitle: Text(movie.overview),
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => DetailScreen(movie: movie)),
+            );
+          },
+          child: Card(
+            elevation: 5,
+            shadowColor: Colors.black.withValues(alpha: 0.5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: ListTile(
+              leading: IsEmptyImage(urlImage: movie.posterPath),
+              title: Text(movie.title),
+              subtitle: Text(movie.overview),
+            ),
           ),
         );
       },

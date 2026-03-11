@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pilem/screens/favorite_screen.dart';
 import 'package:pilem/screens/home_screen.dart';
 import 'package:pilem/screens/search_secreen.dart';
 
@@ -12,7 +13,11 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _Screens = [HomeScreen(), SearchScreen(), HomeScreen()];
+  final List<Widget> _Screens = [
+    HomeScreen(),
+    SearchScreen(),
+    FavoriteScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {

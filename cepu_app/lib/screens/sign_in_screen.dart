@@ -22,7 +22,8 @@ class SignInScreenState extends State<SignInScreen> {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) return;
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -31,18 +32,16 @@ class SignInScreenState extends State<SignInScreen> {
       await FirebaseAuth.instance.signInWithCredential(credential);
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } catch (error) {
       if (!mounted) return;
       setState(() {
         _errorMessage = error.toString();
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_errorMessage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_errorMessage)));
     }
   }
 
@@ -98,8 +97,12 @@ class SignInScreenState extends State<SignInScreen> {
               ),
               const SizedBox(height: 16.0),
               ElevatedButton.icon(
-                icon: const Icon(Icons.login),
+                icon: const Icon(Icons.g_mobiledata),
                 label: const Text('Sign In with Google'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                ),
                 onPressed: signInWithGoogle,
               ),
               const SizedBox(height: 32.0),

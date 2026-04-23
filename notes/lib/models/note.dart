@@ -4,45 +4,46 @@ class Note {
   String? id;
   final String title;
   final String description;
-  String? image_base_64;
-  double? latitude;
-  double? longitude;
-  Timestamp? created_at;
-  Timestamp? updated_at;
+  String? imageBase64;
+  Timestamp? createdAt;
+  Timestamp? updatedAt;
+  String? latitude;
+  String? longitude;
 
   Note({
     this.id,
     required this.title,
     required this.description,
-    this.image_base_64,
+    this.imageBase64,
+    this.createdAt,
+    this.updatedAt,
     this.latitude,
     this.longitude,
-    this.created_at,
-    this.updated_at,
   });
 
-  factory Note.fromMap(Map<String, dynamic> map, String id) {
+  factory Note.fromDocument(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return Note(
-      id: id,
-      title: map['title'] ?? '',
-      description: map['description'] ?? '',
-      image_base_64: map['image_base_64'],
-      latitude: map['latitude'],
-      longitude: map['longitude'],
-      created_at: map['created_at'],
-      updated_at: map['updated_at'],
+      id: doc.id,
+      title: data['title'],
+      description: data['description'],
+      imageBase64: data['image_base_64'],
+      createdAt: data['created_at'] as Timestamp,
+      updatedAt: data['updated_at'] as Timestamp,
+      latitude: data['latitude'],
+      longitude: data['longitude'],
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toDocument() {
     return {
       'title': title,
       'description': description,
-      'image_base_64': image_base_64,
+      'image_base64': imageBase64,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
       'latitude': latitude,
       'longitude': longitude,
-      'created_at': created_at,
-      'updated_at': updated_at,
     };
   }
 }

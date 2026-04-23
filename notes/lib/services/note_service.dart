@@ -7,67 +7,60 @@ class NoteService {
     'notes',
   );
 
-  static Stream<List<Note>> getNotes() {
+  static Future<void> addNote(Note note) async {
+    Map<String, dynamic> newNote = {
+      'title': note.title,
+      'description': note.description,
+      'image_base_64': note.imageBase64,
+      'latitude': note.latitude,
+      'longitude': note.longitude,
+      'created_at': FieldValue.serverTimestamp(),
+      'updated_at': FieldValue.serverTimestamp(),
+    };
+    await _notesCollection.add(newNote);
+  }
+
+  static Future<void> updateNote(Note note) async {
+    Map<String, dynamic> updatedNote = {
+      'title': note.title,
+      'description': note.description,
+      'image_base_64': note.imageBase64,
+      'latitude': note.latitude,
+      'longitude': note.longitude,
+      'created_at': note.createdAt,
+      'updated_at': FieldValue.serverTimestamp(),
+    };
+
+    await _notesCollection.doc(note.id).update(updatedNote);
+  }
+
+  static Future<void> deleteNote(Note note) async {
+    await _notesCollection.doc(note.id).delete();
+  }
+
+  static Future<QuerySnapshot> retrieveNotes() {
+    return _notesCollection.get();
+  }
+
+  static Stream<List<Note>> getNoteList() {
     return _notesCollection.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         return Note(
           id: doc.id,
-          title: data['title'] ?? '',
-          description: data['description'] ?? '',
-          image_base_64: data['image_base_64'],
+          title: data['title'],
+          description: data['description'],
+          imageBase64: data['image_base_64'],
+          createdAt: data['created_at'] != null
+              ? data['created_at'] as Timestamp
+              : null,
+          updatedAt: data['updated_at'] != null
+              ? data['updated_at'] as Timestamp
+              : null,
           latitude: data['latitude'],
           longitude: data['longitude'],
-          created_at: data['created_at'] != null
-              ? (data['created_at'] as Timestamp)
-              : null,
-          updated_at: data['updated_at'] != null
-              ? (data['updated_at'] as Timestamp)
-              : null,
         );
       }).toList();
     });
-  }
-
-  static Future<void> addNote(Note noteData) async {
-    try {
-      Map<String, dynamic> newNote = {
-        'title': noteData.title,
-        'description': noteData.description,
-        'image_base_64': noteData.image_base_64,
-        'latitude': noteData.latitude,
-        'longitude': noteData.longitude,
-        'created_at': FieldValue.serverTimestamp(),
-        'updated_at': FieldValue.serverTimestamp(),
-      };
-      await _notesCollection.add(newNote);
-    } catch (e) {
-      throw Exception('Failed to add note: $e');
-    }
-  }
-
-  static Future<void> updateNote(String id, Note noteData) async {
-    try {
-      Map<String, dynamic> updatedNote = {
-        'title': noteData.title,
-        'description': noteData.description,
-        'image_base_64': noteData.image_base_64,
-        'latitude': noteData.latitude,
-        'longitude': noteData.longitude,
-        'created_at': FieldValue.serverTimestamp(),
-        'updated_at': FieldValue.serverTimestamp(),
-      };
-      await _notesCollection.doc(id).update(updatedNote);
-    } catch (e) {
-      throw Exception('Failed to update note: $e');
-    }
-  }
-
-  static Future<void> deleteNote(String id) async {
-    try {
-      await _notesCollection.doc(id).delete();
-    } catch (e) {
-      throw Exception('Failed to delete note: $e');
-    }
   }
 }

@@ -46,7 +46,13 @@ class PostService {
     return _postsCollection.get();
   }
 
-  static Stream<List<Post>> getNoteList() {
+  static Stream<List<Post>> getNoteList(String? category) {
+    Query query = _postsCollection;
+
+    if (category != null) {
+      query = query.where('category', isEqualTo: category);
+    }
+
     return _postsCollection.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;

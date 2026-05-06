@@ -14,10 +14,12 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_image_compress: ^2.4.0
+  flutter_map: ^8.3.0
   geolocator: ^14.0.2
   google_maps_flutter: ^2.10.0
   google_sign_in: ^6.2.1
   image_picker: ^1.2.2
+  latlong2: ^0.9.1
   url_launcher: ^6.3.2
 
 dev_dependencies:

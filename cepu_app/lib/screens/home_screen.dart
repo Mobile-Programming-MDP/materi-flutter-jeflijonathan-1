@@ -15,6 +15,69 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // 1. Create Variable untuk menyimpan kategori
+  String? selectedCategory;
+  List<String> get categories {
+    return [
+      'Jalan RUsak',
+      'Lampu Jalan Mati',
+      'Lawan Arah',
+      'Merokok di Jalan',
+      'Tidak Pakai Helm',
+    ];
+  }
+
+  // 2. create function untuk menampilkan modal bootom sheet untuk memiliki
+  void _showCategoryFilter() async {
+    final result = await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 4),
+            children: [
+              ListTile(
+                leading: const Icon(Icons.clear),
+                title: Text("All Category"),
+                onTap: () => Navigator.pop(
+                  context,
+                  null,
+                ), // untuk memilih semua kategori
+              ),
+              const Divider(),
+              ...categories.map(
+                (item) => ListTile(
+                  title: Text(item),
+                  trailing: selectedCategory == item
+                      ? Icon(
+                          Icons.check,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : null,
+                  onTap: () => Navigator.pop(context, item),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        selectedCategory = result;
+      });
+    } else {
+      setState(() {
+        selectedCategory = null;
+      });
+    }
+  }
+
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
     if (!mounted) return;
@@ -40,6 +103,11 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: Colors.black,
         elevation: 0,
         actions: [
+          IconButton(
+            onPressed: _showCategoryFilter,
+            icon: const Icon(Icons.filter_list),
+            tooltip: 'Filter',
+          ),
           IconButton(
             onPressed: signOut,
             icon: const Icon(Icons.logout_rounded),
@@ -98,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Posts List
           Expanded(
             child: StreamBuilder<List<Post>>(
-              stream: PostService.getNoteList(),
+              stream: PostService.getNoteList(selectedCategory),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -115,11 +183,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.assignment_outlined, size: 64, color: Colors.grey[300]),
+                        Icon(
+                          Icons.assignment_outlined,
+                          size: 64,
+                          color: Colors.grey[300],
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           "Belum ada laporan.",
-                          style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -188,9 +263,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withOpacity(0.1),
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -224,11 +304,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Icon(Icons.person_pin, size: 16, color: Colors.grey),
+                      const Icon(
+                        Icons.person_pin,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         post.fullName ?? "Anonim",
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),

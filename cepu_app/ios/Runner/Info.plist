@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Aplikasi membutuhkan akses lokasi untuk melaporkan kejadian.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Aplikasi membutuhkan akses lokasi untuk melaporkan kejadian.</string>
 </dict>
 </plist>

@@ -1,47 +1,57 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Post {
-  final String id;
-  final String image;
-  final String description;
-  final String category;
-  final double latitude;
-  final double longitude;
-  final String userId;
-  final String userFullName;
+  String? id;
+  String? image;
+  String? description;
+  String? category;
+  Timestamp? createdAt;
+  Timestamp? updatedAt;
+  String? latitude;
+  String? longitude;
+  String? userId;
+  String? fullName;
 
   Post({
-    required this.id,
-    required this.image,
-    required this.description,
-    required this.category,
-    required this.latitude,
-    required this.longitude,
-    required this.userId,
-    required this.userFullName,
+    this.id,
+    this.image,
+    this.description,
+    this.category,
+    this.createdAt,
+    this.updatedAt,
+    this.latitude,
+    this.longitude,
+    this.userId,
+    this.fullName,
   });
 
-  Map<String, dynamic> toMap() {
+  factory Post.fromDocument(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Post(
+      id: doc.id,
+      image: data['image'],
+      description: data['description'],
+      category: data['category'],
+      createdAt: data['created_at'] != null ? data['created_at'] as Timestamp : null,
+      updatedAt: data['updated_at'] != null ? data['updated_at'] as Timestamp : null,
+      latitude: data['latitude'],
+      longitude: data['longitude'],
+      userId: data['user_id'],
+      fullName: data['full_name'],
+    );
+  }
+
+  Map<String, dynamic> toDocument() {
     return {
-      'id': id,
       'image': image,
       'description': description,
       'category': category,
       'latitude': latitude,
       'longitude': longitude,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
       'user_id': userId,
-      'user_fullname': userFullName,
+      'full_name': fullName,
     };
-  }
-
-  factory Post.fromMap(Map<String, dynamic> map, String documentId) {
-    return Post(
-      id: documentId,
-      image: map['image'] ?? '',
-      description: map['description'] ?? '',
-      category: map['category'] ?? '',
-      latitude: map['latitude']?.toDouble() ?? 0.0,
-      longitude: map['longitude']?.toDouble() ?? 0.0,
-      userId: map['user_id'] ?? '',
-      userFullName: map['user_fullname'] ?? '',
-    );
   }
 }

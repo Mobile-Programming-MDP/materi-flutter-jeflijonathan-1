@@ -1,5 +1,5 @@
 import 'package:cepu_app/firebase_options.dart';
-import 'package:cepu_app/screens/home_screen.dart';
+import 'package:cepu_app/screens/main_screen.dart';
 import 'package:cepu_app/screens/sign_in_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,18 +18,29 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Cepu App",
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF2E7D32), // A nice forest green
+          primary: const Color(0xFF2E7D32),
+        ),
         useMaterial3: true,
+        fontFamily: 'Roboto', // Using a standard clean font
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+          elevation: 0,
+        ),
       ),
       home: StreamBuilder(
-        // widget terus menangkap snapshot dari sebuah aliran data /
-        // ada koneksi yang sering terhubung ke server lalu akan listen proses
-        // transaksi data tersebut dan menangkap snapshot terakhir
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
           if (snapshot.hasData) {
-            return const HomeScreen();
+            return const MainScreen();
           } else {
             return const SignInScreen();
           }

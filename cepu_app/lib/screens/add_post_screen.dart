@@ -8,6 +8,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({super.key});
@@ -21,7 +22,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
   String? _base64Image;
   String? _latitude;
   String? _longitude;
+
   bool _isLoading = false;
+  bool _isGenerating = false;
 
   final List<String> categories = [
     'Jalan Rusak',
@@ -74,7 +77,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
       }
 
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       ).timeout(const Duration(seconds: 10));
 
       setState(() {
@@ -107,6 +112,52 @@ class _AddPostScreenState extends State<AddPostScreen> {
     }
   }
 
+  Future<void> _generateDescriptionWithAI() async {
+    if (_base64Image == null) return;
+    setState(() => _isGenerating = true);
+
+    try {
+      const apiKey = '';
+      const url = "";
+      final body = jsonEncode({
+        "content": [
+          {
+            'parts': [
+              {
+                'inlineData': {"mimeType": "image/jpeg", "data": _base64Image},
+              },
+              {
+                'text': {
+                  'berdasarkan foto ini, indentifikasi satu kategori utama kerusakan fasilitas umum'
+                      'dari daftar berikut: Jalan rusak, Lampu jlan mati, lawan arah, merokok di jalan, tidak pakai helem, dan lainnya.'
+                      'pilih kategori yang paling dominana atau paling mendesak untuk dilaporkan'
+                      'Buat deskripsi singkat untuk laporan perbaikan, dan tambahkan permohonan perbaikkan. '
+                      'fokus pada kerusakan yang terlihat dan hindari spekulasi. \n\n'
+                      'format output yang diinginkan: \n'
+                      'kategori: [satu kategori yang dipilih] \n'
+                      'deksripsi: [deskripsi singkat]',
+                },
+              },
+            ],
+          },
+        ],
+      });
+      final headers = {'Content-Type': 'application/json'};
+      final res = await http.post(Uri.parse(url), headers: headers, body: body);
+      if (res.statusCode == 200) {
+        setState(() {
+          _descriptionController.text = res.body;
+        });
+      } else {
+        debugPrint("Request Failed: ${res.body}");
+      }
+    } catch (e) {
+      debugPrint('Failed to generate AI  description: $e');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
+    }
+  }
+
   void _showCategorySelect() {
     showModalBottomSheet(
       context: context,
@@ -132,7 +183,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     final cat = categories[index];
                     return ListTile(
                       title: Text(cat),
-                      leading: Icon(Icons.label_outline, color: Theme.of(context).primaryColor),
+                      leading: Icon(
+                        Icons.label_outline,
+                        color: Theme.of(context).primaryColor,
+                      ),
                       onTap: () {
                         setState(() {
                           _category = cat;
@@ -159,9 +213,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
     }
 
     if (_category == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Silakan pilih kategori.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Silakan pilih kategori.")));
       return;
     }
 
@@ -174,7 +228,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
     if (_latitude == null || _longitude == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Silakan tentukan lokasi terlebih dahulu.")),
+        const SnackBar(
+          content: Text("Silakan tentukan lokasi terlebih dahulu."),
+        ),
       );
       return;
     }
@@ -205,13 +261,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Gagal mengirim laporan: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Gagal mengirim laporan: $e")));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose(); // Selalu bersihkan controller
+    super.dispose();
   }
 
   @override
@@ -239,19 +301,32 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       decoration: BoxDecoration(
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey[300]!, style: BorderStyle.solid),
+                        border: Border.all(
+                          color: Colors.grey[300]!,
+                          style: BorderStyle.solid,
+                        ),
                       ),
                       child: _base64Image != null
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(16),
-                              child: Image.memory(base64Decode(_base64Image!), fit: BoxFit.cover),
+                              child: Image.memory(
+                                base64Decode(_base64Image!),
+                                fit: BoxFit.cover,
+                              ),
                             )
                           : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.add_a_photo_outlined, size: 48, color: Colors.grey[400]),
+                                Icon(
+                                  Icons.add_a_photo_outlined,
+                                  size: 48,
+                                  color: Colors.grey[400],
+                                ),
                                 const SizedBox(height: 8),
-                                Text("Ambil Foto Kejadian", style: TextStyle(color: Colors.grey[600])),
+                                Text(
+                                  "Ambil Foto Kejadian",
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
                               ],
                             ),
                     ),
@@ -259,13 +334,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   const SizedBox(height: 24),
 
                   // Category Selector
-                  const Text("Kategori", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const Text(
+                    "Kategori",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                   const SizedBox(height: 8),
                   InkWell(
                     onTap: _showCategorySelect,
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey[300]!),
                         borderRadius: BorderRadius.circular(12),
@@ -276,7 +357,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                           Text(
                             _category ?? "Pilih Kategori",
                             style: TextStyle(
-                              color: _category == null ? Colors.grey : Colors.black87,
+                              color: _category == null
+                                  ? Colors.grey
+                                  : Colors.black87,
                               fontSize: 16,
                             ),
                           ),
@@ -288,13 +371,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   const SizedBox(height: 24),
 
                   // Location Selector
-                  const Text("Lokasi", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const Text(
+                    "Lokasi",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey[300]!),
                             borderRadius: BorderRadius.circular(12),
@@ -305,7 +394,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                 ? "${double.parse(_latitude!).toStringAsFixed(4)}, ${double.parse(_longitude!).toStringAsFixed(4)}"
                                 : "Lokasi belum dipilih",
                             style: TextStyle(
-                              color: (_latitude != null && _longitude != null) ? Colors.black87 : Colors.grey,
+                              color: (_latitude != null && _longitude != null)
+                                  ? Colors.black87
+                                  : Colors.grey,
                             ),
                           ),
                         ),
@@ -320,14 +411,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
                         onPressed: _isLoading ? null : _pickLocationOnMap,
                         icon: const Icon(Icons.map_outlined),
                         tooltip: "Pilih di Peta",
-                        style: IconButton.styleFrom(backgroundColor: Colors.orange),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
 
                   // Description
-                  const Text("Deskripsi", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const Text(
+                    "Deskripsi",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _descriptionController,
@@ -355,10 +451,18 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).primaryColor,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 0,
                       ),
-                      child: const Text("Kirim Laporan", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        "Kirim Laporan",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],
